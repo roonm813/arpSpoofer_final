@@ -82,58 +82,11 @@ bool getMac(uint8_t mac_address[6],char* dev){
         else { printf("getmac _ error ioctl\n"); }
     }
 
-//    unsigned char mac_address[6];
 
     if (success) memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
     if (success) return true; 
 }
 
-/*bool getMac(uint8_t mac[6], char* dev){
-	int sock; 
-	struct ifreq ifr;  
-	sock = socket(AF_INET, SOCK_STREAM, 0); 
-	if(sock < 0){
-		printf("util.h _ getMac _ iotcl error\n"); 
-		return false; 
-	}
-	strcpy(ifr.ifr_name, dev); 
-	if(ioctl(sock, SIOCGIFADDR, &ifr) < 0) {
-		printf("util.h _ getMac _ ioctol error\n"); 	
-		return false; 
-	}
-	struct ifreq* it = ifr.ifc_req; 
-	memcpy(mac, ifr.ifr_hwaddr.sa_data, 6); 
-	struct ifreq ifr; 
-	struct ifconf ifc; 
-	char buf[1024]; 
-	int success = 0; 
-	int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP); 
-	if(sock == -1) {
-		printf("util.h _ getMac _ socker err\n"); 
-		return false; 
-	}
-
-	struct ifreq* it = ifc.ifc_req; 
-	const struct ifreq* const end = it + (ifc.ifc_len /sizeof(struct ifreq)); 
-
-	for(; it != end ; it++){
-		strcpy(ifr.ifr_name, it->ifr_name); 
-		if(ioctl(sock, SIOCGIFFLAGS, &ifr) == 0){
-			if(!(ifr.ifr_flags & IFF_LOOPBACK)){
-				if(ioctl(sock, SIOCGIFHWADDR, &ifr) == 0){
-					success = 1; 
-					break; 
-				}
-			}
-		}
-		else{
-			printf("util.h _ ioctl error \n"); 
-		}
-	}
-	if(success) memcpy(mac, ifr.ifr_hwaddr.sa_data, 6); 
-	
-	return true; 
-}*/
 
 bool getgateway(uint8_t addr[4]){
 	long destination, gateway; 
@@ -170,33 +123,13 @@ void usage() {
 	printf("target means the one you wnat to write sender's arp table!\n");
 }
 
-int basicSetting(int argc, char* argv[]){
-  if (argc >= 4 && argc%2 != 0) {
-	  usage();
-		return -1;
-	}
-	char* dev = argv[1];
-	char errbuf[PCAP_ERRBUF_SIZE];
-	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
-	if (handle == NULL) {
-		fprintf(stderr, "couldn't open device %s: %s\n", dev, errbuf);
-		return -1;
-	}
-	getIp(ip, dev);
-	printDecValue("[+] ip : ", ip, 4, '.');
-	getMac(mac, dev);
-	printHexValue("[+] mac : ", mac, 6, ':');
-	printf("argc is %d\n", argc);
-
-	sessionSize= argc/2 -1; 
-	sessionNumber = (int*) malloc(sizeof(int)*sessionSize); 
-	for(int i= 0; i < sessionSize; i++) 
-		sessionNumber[i] = i; 
-	pthread_mutex_init(&mutex, NULL);
-	threadSignal = (int*)malloc(sizeof(int)*(sessionSize));
-	for(int i = 0; i < sessionSize; i++) 
-		threadSignal[i] = 0; 
-	ipsets = (ip_set*) malloc(sizeof(int)*(sessionSize)); 
-	return 1;
+void setSignal(int num){
+  pthread_mutex_lock(&mutex);
+	threadSignal[num] = 1;
+	pthread_mutex_unlock(&mutex);
 }
-
+void  resetSignal(int num){
+  pthread_mutex_lock(&mutex);
+	threadSignal[num] = 0;
+	pthread_mutex_unlock(&mutex);
+} 

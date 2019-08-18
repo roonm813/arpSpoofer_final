@@ -27,8 +27,6 @@ int isArp(struct pcap_pkthdr* header, const u_char* packet){
 
 bool isArpReply(uint8_t sender_mac[6], uint8_t sender_ip[4], struct pcap_pkthdr* header, const u_char* packet){
 	int32_t index = 0;
-//  printHexValue("", sender_mac, 6, ':'); 
-//	printDecValue("", sender_ip, 4, '.'); 
 	if((index = isArp(header, packet)) != -1){
 	 	arpHeader arpHeader;
    	index += readArp(packet+index, &arpHeader);
@@ -40,30 +38,9 @@ bool isArpReply(uint8_t sender_mac[6], uint8_t sender_ip[4], struct pcap_pkthdr*
 	return false;
 }
 
-
-
-bool isArpRequest(uint8_t sender_ip[4], uint8_t target_ip[4], struct pcap_pkthdr* header, const u_char* packet){
-	int32_t index = 0; 
-	if((index = isArp(header, packet)) != -1){
-		arpHeader arpHeader; 
-		index += readArp(packet+index, &arpHeader); 
-	//	memcpy(target_ip, arpHeader.
-	}
-	else 
-	 	return -1; 
-}
-
 int ethernetSourceCheck(uint8_t* get_addr){
 	for(int i= 0; i < sessionSize; i++){
-		if(memcmp(get_addr, ipsets[i].senderMac, 6)==0) 
-			return i; 
-	}
-	return -1; 
-}
-
-int ethernetDestCheck(uint8_t* get_addr){
-	for(int i = 0; i < sessionSize; i++){
-		if(memcmp(get_addr, ipsets[i].targetMac, 6) == 0) 
+		if(memcmp(get_addr, sessions[i].senderMac, 6)==0) 
 			return i; 
 	}
 	return -1; 
@@ -71,7 +48,7 @@ int ethernetDestCheck(uint8_t* get_addr){
 
 int arpCheck(uint8_t* targetIp){
 	for(int i = 0; i < sessionSize; i++)
-		if(memcmp(targetIp, ipsets[i].targetIp, 4)==0) 
+		if(memcmp(targetIp, sessions[i].targetIp, 4)==0) 
 			return i; 
 	return -1; 
 }
@@ -101,11 +78,6 @@ int RelayAnalysis(struct pcap_pkthdr* header, const u_char* packet, int* sigNum)
 		ipHeaderV4 ip; 
 		index += readIp(packet+index, &ip); 
 		printIp(&ip); 
-		/*if(memcmp(ip.destIpAddr, ipsets[*sigNum].targetIp, 4) == 0){
-			printf("In RelayAna, Match!!\n"); 
-			return *sigNum; 
-		}
-		return -2; */ 
 	}
 	return *sigNum; 
 }

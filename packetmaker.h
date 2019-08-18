@@ -9,7 +9,6 @@ typedef struct arpPacket{
 }arpPacket; 
 
 bool sendArp(pcap_t* handle, const uint8_t* sender_mac, const uint8_t* sender_ip, const uint8_t* target_mac, const uint8_t* target_ip, bool isRequest) {
-//	printf("========== send infection packet ===================\n");
 	arpPacket _arpPacket;
 
 	ethernetHeader* _eth = &(_arpPacket.etherh);  
@@ -37,7 +36,7 @@ bool sendArp(pcap_t* handle, const uint8_t* sender_mac, const uint8_t* sender_ip
 	memcpy(_arp->senderIpAddr, sender_ip, 4); 
 	memcpy(_arp->recvMacAddr, target_mac, 6); 
 	memcpy(_arp->recvIpAddr, target_ip, 4); 
-  //print packet in raw data for debugging 
+  /*print packet in raw data for debugging 
 	printf("size is = %d\n", sizeof(arpPacket)); 
 	unsigned char* packet = (unsigned char*) malloc(sizeof(unsigned char)*sizeof(arpPacket));  
 	memcpy(packet, &_arpPacket, sizeof(arpPacket)); 
@@ -45,7 +44,11 @@ bool sendArp(pcap_t* handle, const uint8_t* sender_mac, const uint8_t* sender_ip
 	for(int i= 0; i < sizeof(arpPacket); i++){
 		printf("%02x ", packet[i]); 
 		fflush(stdout);  
-	} 
-	return pcap_inject(handle, (u_char*)&_arpPacket, sizeof(arpPacket)) == sizeof(arpPacket); 	
+	} */
+	
+	pthread_mutex_lock(&mutex); 
+	int res = (pcap_inject(handle, (u_char*)&_arpPacket, sizeof(arpPacket)) == sizeof(arpPacket));
+  pthread_mutex_unlock(&mutex); 
+	return res; 
 }
 #endif

@@ -21,18 +21,18 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-typedef struct ip_set{
+typedef struct sessionInfo{
   uint8_t senderIp[4];
 	uint8_t senderMac[6];
 	uint8_t targetIp[4];
 	uint8_t targetMac[6];
-} ip_set;
+} sessionInfo;
 
 
 //====== pthread global =========
 pthread_mutex_t mutex;
 int* threadSignal;
-ip_set* ipsets;  
+sessionInfo* sessions;  
 pcap_t* handle;
 int sessionSize;
 int* sessionNumber; 
@@ -48,6 +48,7 @@ bool getIp(uint8_t ip[4], char* dev);
 bool getMac(uint8_t mac[6], char* dev); 
 bool getgateway(uint8_t addr[4]); 
 void usage(); 
-int basicSetting(int argc, char* argv[]); 
-//int sessionSetting(int argc, char* argv[]); 
+//int basicSetting(int argc, char* argv[]); 
+void setSignal(int num); 
+void resetSignal(int num); 
 #endif
