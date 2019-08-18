@@ -45,12 +45,12 @@ int main(int argc, char* argv[]) {
 				memcpy(packet, sessions[result].targetMac, 6);	
 				memcpy(packet + 6, mac, 6); 
 				printHexValue("RELAY >> relay to new Target : ", sessions[result].targetMac, 6, ':');
-				printf("\n"); 
 				pthread_mutex_lock(&mutex); 
 				if(pcap_inject(handle, packet, header->caplen) == header->caplen) 
 					printf("RELAY >> relay success\n"); 
 				pthread_mutex_unlock(&mutex); 
 		 	}
+		printf("\n"); 
 	} 
 	pcap_close(handle); 
 	return 0; 
