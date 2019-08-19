@@ -14,7 +14,7 @@ void printipSets(int n){
 	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
   printf("session set [%d] infomation\n", n); 
   printDecValue("sender ip \t: ", sessions[n].senderIp, 4, '.');
-  printHexValue("sender mac \t: ", sessions[n].senderMac, 6, ';');
+  printHexValue("sender mac \t: ", sessions[n].senderMac, 6, ':');
   printDecValue("target ip \t: ", sessions[n].targetIp, 4, '.');
   printHexValue("target mac \t: ", sessions[n].targetMac, 6, ':');
   printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -72,7 +72,6 @@ void* arpSpoofer(void* idx){
 		}
 		tryingInfection(num); 
 		resetSignal(num); 
-		usleep(500); 
 	}
 }
 
